@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 import PyInstaller.__main__
@@ -117,13 +118,24 @@ a.binaries = new_binaries
 
     # Invoke PyInstaller through the current interpreter rather than relying on a
     # `pyinstaller` executable being on PATH (it may not be when the venv is not
-    # activated). Raise on failure so the error is not swallowed silently.
-    exit_code = os.system(
-        f'"{sys.executable}" -m PyInstaller "{spec_path}" --noconfirm '
-        f'--distpath "{dist_path}" --workpath "{work_path}"'
+    # activated). Use subprocess with an argument list instead of os.system so
+    # that paths containing spaces are passed verbatim, avoiding cmd.exe's
+    # quote-mangling on Windows. Raise on failure so it is not swallowed.
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "PyInstaller",
+            spec_path,
+            "--noconfirm",
+            "--distpath",
+            dist_path,
+            "--workpath",
+            work_path,
+        ]
     )
-    if exit_code != 0:
-        raise RuntimeError(f"PyInstaller failed while building from the patched spec (exit code {exit_code}).")
+    if result.returncode != 0:
+        raise RuntimeError(f"PyInstaller failed while building from the patched spec (exit code {result.returncode}).")
 
 
 if __name__ == "__main__":
