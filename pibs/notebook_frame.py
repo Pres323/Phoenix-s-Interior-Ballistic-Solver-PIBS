@@ -12,10 +12,9 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-from ballistics import Propellant
 from .ballistics.recoilless import RecoillessTableEntry
 from . import FONTSIZE, FONTNAME, THEMES
-from .ballistics import DOMAIN_TIME, DOMAIN_LEN, CONVENTIONAL, RECOILLESS
+from .ballistics import Propellant, DOMAIN_TIME, DOMAIN_LEN, CONVENTIONAL, RECOILLESS
 from .ballistics.gun import GunResult, Gun
 from .localized_widget import LocalizedFrame
 from .misc import validate_nn, validate_ce
