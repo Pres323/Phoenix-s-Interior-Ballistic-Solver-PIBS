@@ -1,3 +1,4 @@
+import importlib.util
 import os
 import subprocess
 import sys
@@ -9,6 +10,38 @@ from pibs import __version__
 # Resolve everything relative to this file so the script works regardless of the
 # current working directory it is invoked from.
 ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# Runtime dependencies that must be importable so PyInstaller can bundle them.
+# Maps the importable module name -> the pip package that provides it.
+REQUIRED_MODULES = {
+    "matplotlib": "matplotlib",
+    "labellines": "matplotlib-label-lines",
+    "tabulate": "tabulate",
+    "psutil": "psutil",
+    "tqdm": "tqdm",
+    "screeninfo": "screeninfo",
+}
+
+
+def _check_dependencies():
+    """Ensure the project's runtime dependencies are installed in this interpreter.
+
+    PyInstaller only bundles packages it can actually import. If a dependency is
+    missing it merely prints a warning and still produces an executable that
+    crashes at startup (e.g. "No module named 'matplotlib'"). Fail early instead,
+    with the exact command needed to fix it.
+    """
+    missing = sorted({pkg for mod, pkg in REQUIRED_MODULES.items() if importlib.util.find_spec(mod) is None})
+    if missing:
+        raise SystemExit(
+            "ERROR: the following dependencies are not installed in the Python\n"
+            f"interpreter used to build ({sys.executable}):\n"
+            + "\n".join("  - " + pkg for pkg in missing)
+            + "\n\nPyInstaller can only bundle packages it can import, so the resulting\n"
+            "executable would crash at startup. Install the project's dependencies\n"
+            "into this interpreter first, e.g. from the project root:\n"
+            f'  "{sys.executable}" -m pip install .[dev]\n'
+        )
 
 
 def _check_required_paths():
@@ -140,6 +173,7 @@ a.binaries = new_binaries
 
 if __name__ == "__main__":
     _check_required_paths()
+    _check_dependencies()
     # Build from the project root so PyInstaller's work/dist folders and the
     # generated .spec land alongside the project rather than in whatever
     # directory the script happened to be launched from.
