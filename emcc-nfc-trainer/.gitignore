@@ -1,7 +1,0 @@
-# OS / editor cruft
-.DS_Store
-Thumbs.db
-*.swp
-
-# Local scratch (not part of the deliverable)
-*.local.json
