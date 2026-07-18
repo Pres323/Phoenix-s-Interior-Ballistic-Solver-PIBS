@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#0a0a0a" />
+<title>EMCC Trainer</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header id="app-header">
+  <h1 id="app-title">EMCC TRAINER</h1>
+  <div id="header-right">
+    <span id="offline-badge" class="badge" hidden>OFFLINE READY</span>
+  </div>
+</header>
+
+<main id="app-main">
+
+  <!-- SCAN / HOME -->
+  <section id="screen-scan" class="screen active">
+    <button id="scan-btn" class="big-btn primary">TAP CARD</button>
+    <p id="scan-status" class="status-text">Waiting for NFC tag…</p>
+
+    <div class="divider">or</div>
+
+    <form id="manual-form" class="manual-form">
+      <label for="manual-card-id">Enter card number (1–49)</label>
+      <input id="manual-card-id" type="number" min="1" max="49" inputmode="numeric" required />
+      <button type="submit" class="big-btn">LOAD CARD</button>
+    </form>
+
+    <div id="resume-list-wrap" hidden>
+      <h2>Resume active scenarios</h2>
+      <ul id="resume-list"></ul>
+    </div>
+  </section>
+
+  <!-- ACTIVE SCENARIO -->
+  <section id="screen-scenario" class="screen">
+    <div id="scenario-header">
+      <button id="back-to-scan" class="icon-btn" aria-label="Back">←</button>
+      <div id="scenario-title">
+        <div id="scenario-moi-loc"></div>
+        <div id="scenario-timer">00:00</div>
+      </div>
+      <span id="scenario-state-pill" class="pill"></span>
+    </div>
+
+    <nav id="scenario-tabs">
+      <button class="tab-btn active" data-tab="casualty">CASUALTY</button>
+      <button class="tab-btn" data-tab="treat">TREAT</button>
+      <button class="tab-btn" data-tab="history">HISTORY</button>
+    </nav>
+
+    <div id="tab-casualty" class="tab-panel active">
+      <div id="casualty-instructions" class="card-block"></div>
+      <div id="casualty-vitals" class="card-block"></div>
+    </div>
+
+    <div id="tab-treat" class="tab-panel">
+      <div class="actor-fields">
+        <input id="actor-name" placeholder="Your name" />
+        <input id="actor-role" placeholder="Role (e.g. 68W, Medic)" />
+      </div>
+      <div id="march-checklist"></div>
+    </div>
+
+    <div id="tab-history" class="tab-panel">
+      <ul id="history-list"></ul>
+    </div>
+  </section>
+
+  <!-- OC/T ADMIN -->
+  <section id="screen-admin" class="screen">
+    <div id="admin-header">
+      <button id="admin-close" class="icon-btn" aria-label="Close">✕</button>
+      <h2>OC/T ADMIN</h2>
+    </div>
+    <div id="admin-body"></div>
+  </section>
+
+</main>
+
+<!-- PIN prompt overlay -->
+<div id="pin-overlay" class="overlay" hidden>
+  <div class="overlay-box">
+    <h2>OC/T PIN</h2>
+    <input id="pin-input" type="password" inputmode="numeric" maxlength="8" autocomplete="off" />
+    <div class="overlay-actions">
+      <button id="pin-cancel" class="btn">Cancel</button>
+      <button id="pin-submit" class="btn primary">Enter</button>
+    </div>
+    <p id="pin-error" class="error-text" hidden>Incorrect PIN</p>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
