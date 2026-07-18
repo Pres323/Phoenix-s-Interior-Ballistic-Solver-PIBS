@@ -11,9 +11,12 @@
       "Each physical card prints ONE vitals progression (poi -> role1 -> role2), not separate branching tables. Some cells carry an inline '(if treated)' qualifier.",
       "Cells marked inferred:true are NOT printed on the card — they're clinically plausible values or branch logic I generated to satisfy the state-machine/rules requirement, per your instructions to flag anything invented.",
       "'XXXX' on the card (value unobtainable at that echelon) is stored as null.",
-      "The physical card also has admin-only fields not modeled here: Battle Roster #, Unit, OCT Call Sign/P2P, POI DTG, and an 'OCT STATUS / GIVEN' WIA-DOW-RTD bookkeeping box for the live exercise. Flagging for your review — say the word if you want any of these in the schema.",
       "Card image/photo on the front is not reproduced (copyrighted training-aid artwork); only text fields are extracted."
-    ]
+    ],
+    "player_tracking": {
+      "note": "The physical card's blank admin fields (Battle Roster #, Unit, OCT Call Sign/P2P, POI DTG, and the OCT STATUS/GIVEN WIA-DOW-RTD box) are runtime data filled in during an exercise, not static per-card facts — so they live under each card's 'admin_template' as the blank shape the app instantiates per session, and the actual filled-in values go in the app's session ledger (localStorage), one instance per scan/patient run, keyed by battle_roster + card id + session start time. This lets the same physical card be reused across multiple trainees/exercises without collision.",
+      "oct_status_enum": ["WIA", "DOW", "RTD"]
+    }
   },
   "cards": [
     {
@@ -25,6 +28,14 @@
       "triage_answer": "Delayed",
       "evac_answer": "Priority",
       "patient_instructions": ["Lie down", "You can talk.", "You cannot walk."],
+      "admin_template": {
+        "card_fields": { "battle_roster": null, "unit": null, "oct_call_sign_p2p": null, "poi_dtg": null },
+        "echelon_fields": {
+          "poi":   { "time_arrived": null, "oct_status": null },
+          "role1": { "time_arrived": null, "oct_status": null },
+          "role2": { "time_arrived": null, "oct_status": null }
+        }
+      },
       "states": {
         "untreated": {
           "inferred": false,
@@ -65,6 +76,14 @@
       "triage_answer": "Delayed",
       "evac_answer": "Priority",
       "patient_instructions": ["You can talk", "You can walk."],
+      "admin_template": {
+        "card_fields": { "battle_roster": null, "unit": null, "oct_call_sign_p2p": null, "poi_dtg": null },
+        "echelon_fields": {
+          "poi":   { "time_arrived": null, "oct_status": null },
+          "role1": { "time_arrived": null, "oct_status": null },
+          "role2": { "time_arrived": null, "oct_status": null }
+        }
+      },
       "states": {
         "untreated": {
           "inferred": false,
@@ -104,6 +123,14 @@
       "triage_answer": "Immediate",
       "evac_answer": "Urgent",
       "patient_instructions": ["You cannot talk.", "You cannot walk."],
+      "admin_template": {
+        "card_fields": { "battle_roster": null, "unit": null, "oct_call_sign_p2p": null, "poi_dtg": null },
+        "echelon_fields": {
+          "poi":   { "time_arrived": null, "oct_status": null },
+          "role1": { "time_arrived": null, "oct_status": null },
+          "role2": { "time_arrived": null, "oct_status": null }
+        }
+      },
       "states": {
         "untreated": {
           "inferred": false,
