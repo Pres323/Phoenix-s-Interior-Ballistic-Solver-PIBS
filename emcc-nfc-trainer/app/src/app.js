@@ -40,7 +40,9 @@ function loadCardById(cardId) {
 
 function enterScenario() {
   showScreen("screen-scenario");
-  document.getElementById("scenario-moi-loc").textContent = `${state.card.moi} — ${state.card.location}`;
+  document.getElementById("scenario-moi-loc").textContent = state.card.location
+    ? `${state.card.moi} — ${state.card.location}`
+    : state.card.moi;
   setTab("casualty");
   tick();
   restoreActorFields();
@@ -174,7 +176,8 @@ function renderResumeList() {
     const card = state.cards.get(s.cardId);
     const li = document.createElement("li");
     const btn = document.createElement("button");
-    btn.textContent = `#${s.cardId} — ${card ? card.moi + " / " + card.location : "unknown"} (${s.status})`;
+    const label = card ? (card.location ? `${card.moi} / ${card.location}` : card.moi) : "unknown";
+    btn.textContent = `#${s.cardId} — ${label} (${s.status})`;
     btn.addEventListener("click", () => loadCardById(s.cardId));
     li.appendChild(btn);
     list.appendChild(li);

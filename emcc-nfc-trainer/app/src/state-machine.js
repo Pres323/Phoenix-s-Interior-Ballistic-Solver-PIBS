@@ -10,6 +10,18 @@ function ruleAppliesToAction(rule, action, currentState, elapsedMin) {
   return true;
 }
 
+const ENTRY_STATE_CANDIDATES = ["untreated", "initial", "baseline"];
+
+/** Most cards use "untreated" as their entry state, but the deck's special
+ * cards (KIA, ROE) don't have an "untreated" state at all — fall back to
+ * whichever entry-like name the card actually defines. */
+function entryState(card) {
+  for (const name of ENTRY_STATE_CANDIDATES) {
+    if (card.states[name]) return name;
+  }
+  return Object.keys(card.states)[0];
+}
+
 function nextTimerEvent(card, currentState, stateEnteredAt, scenarioStartAt) {
   let best = null;
   for (const rule of card.rules || []) {
@@ -30,13 +42,14 @@ function nextTimerEvent(card, currentState, stateEnteredAt, scenarioStartAt) {
  * @returns {{ state: string, stateEnteredAt: number|null, history: Array, started: boolean }}
  */
 export function resolveState(card, ledger, nowMs) {
+  const initialState = entryState(card);
   const startEntry = ledger.find((e) => e.type === "scenario_start");
   if (!startEntry) {
-    return { state: "untreated", stateEnteredAt: null, history: [], started: false };
+    return { state: initialState, stateEnteredAt: null, history: [], started: false };
   }
 
   const scenarioStartAt = startEntry.ts;
-  let state = "untreated";
+  let state = initialState;
   let stateEnteredAt = scenarioStartAt;
   const history = [{ state, at: scenarioStartAt, via: "scenario_start" }];
 

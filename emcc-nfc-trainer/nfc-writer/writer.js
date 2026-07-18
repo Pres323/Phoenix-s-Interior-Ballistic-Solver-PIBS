@@ -17,7 +17,8 @@ function payloadFor(cardId) {
 
 function cardLabel(id) {
   const c = state.cards.get(id);
-  return c ? `#${id} — ${c.moi} / ${c.location}` : `#${id}`;
+  if (!c) return `#${id}`;
+  return c.location ? `#${id} — ${c.moi} / ${c.location}` : `#${id} — ${c.moi}`;
 }
 
 async function loadCards() {
@@ -152,7 +153,7 @@ function renderVerifyResult(cardId) {
   el.innerHTML = card
     ? `
       <h3>Tag maps to</h3>
-      <div class="verify-result"><span class="vv">#${card.id} — ${card.moi} / ${card.location}</span></div>
+      <div class="verify-result"><span class="vv">${cardLabel(card.id)}</span></div>
       <div class="verify-result"><span class="vk">Diagnosis:</span> ${card.diagnosis}</div>
       <div class="verify-result"><span class="vk">Triage / Evac:</span> ${card.triage_answer} / ${card.evac_answer}</div>
     `

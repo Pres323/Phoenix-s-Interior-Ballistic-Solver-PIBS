@@ -61,7 +61,7 @@ function renderAdmin() {
   body.innerHTML = "";
 
   if (session && card) {
-    body.appendChild(renderAnswerKey(card));
+    body.appendChild(renderAnswerKey(card, session));
     body.appendChild(renderStateMachine(card, session));
     body.appendChild(renderControls(card, session));
     body.appendChild(renderGrading(card, session));
@@ -76,13 +76,29 @@ function renderAdmin() {
   body.appendChild(renderPinChange());
 }
 
-function renderAnswerKey(card) {
+function renderAnswerKey(card, session) {
   const el = document.createElement("div");
   el.className = "admin-section";
+
+  const loggedActions = new Set(
+    session.ledger.filter((e) => e.type === "intervention").map((e) => e.action)
+  );
+  const override = (card.rules || []).find(
+    (r) => r.action && loggedActions.has(r.action) && (r.evac_override || r.triage_override)
+  );
+
+  const triageLine = override?.triage_override
+    ? `<div class="answer-key">Triage: <s style="color:var(--fg-dim);">${card.triage_answer}</s> → ${override.triage_override}</div>`
+    : `<div class="answer-key">Triage: ${card.triage_answer}</div>`;
+  const evacLine = override?.evac_override
+    ? `<div class="answer-key">Evac: <s style="color:var(--fg-dim);">${card.evac_answer}</s> → ${override.evac_override}</div>`
+    : `<div class="answer-key">Evac: ${card.evac_answer}</div>`;
+
   el.innerHTML = `
     <h3>Answer Key — Card #${card.id}</h3>
-    <div class="answer-key">Triage: ${card.triage_answer}</div>
-    <div class="answer-key">Evac: ${card.evac_answer}</div>
+    ${triageLine}
+    ${evacLine}
+    ${override ? `<p style="color:var(--accent);font-size:0.85rem;">${escapeHtml(override.note || "")}</p>` : ""}
     <p>${escapeHtml(card.diagnosis)}</p>
   `;
   return el;
@@ -197,8 +213,17 @@ function renderControls(card, session) {
 function renderGrading(card, session) {
   const el = document.createElement("div");
   el.className = "admin-section";
-  const triageOptions = ["Immediate", "Delayed", "Minimal", "Expectant"];
+  const triageOptions = ["Immediate", "Delayed", "Minimal", "Expectant", "Convenience"];
   const evacOptions = ["Urgent Surgical", "Urgent", "Priority", "Routine", "Convenience"];
+
+  const loggedActions = new Set(
+    session.ledger.filter((e) => e.type === "intervention").map((e) => e.action)
+  );
+  const override = (card.rules || []).find(
+    (r) => r.action && loggedActions.has(r.action) && (r.evac_override || r.triage_override)
+  );
+  const effectiveTriage = override?.triage_override || card.triage_answer;
+  const effectiveEvac = override?.evac_override || card.evac_answer;
 
   el.innerHTML = `
     <h3>Grade Trainee</h3>
@@ -232,8 +257,8 @@ function renderGrading(card, session) {
       UI.toast("Select both triage and evac before grading.");
       return;
     }
-    const triageCorrect = triageChoice === card.triage_answer;
-    const evacCorrect = evacChoice === card.evac_answer;
+    const triageCorrect = triageChoice === effectiveTriage;
+    const evacCorrect = evacChoice === effectiveEvac;
     const admin = { graded: true, triageChoice, evacChoice, triageCorrect, evacCorrect };
     Ledger.updateSession(session.id, (s) => {
       s.admin = admin;
