@@ -332,6 +332,7 @@ h1, h2, h3 { margin: 0; }
   justify-content: center;
   z-index: 100;
 }
+.overlay[hidden] { display: none; }
 .overlay-box {
   background: var(--bg-raised);
   border: 1px solid var(--border);
